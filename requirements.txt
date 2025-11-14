@@ -1,0 +1,29 @@
+# Arc Flash Prediction System - Requirements
+# Install with: pip install -r requirements.txt
+
+# Core Data Science Libraries
+pandas>=1.5.0
+numpy>=1.23.0
+
+# Machine Learning
+scikit-learn>=1.2.0
+
+# Model Persistence
+joblib>=1.2.0
+
+# Optional: Additional ML libraries (uncomment if needed)
+# xgboost>=1.7.0
+# lightgbm>=3.3.0
+# catboost>=1.1.0
+
+# Optional: Deep Learning (uncomment if needed)
+# tensorflow>=2.11.0
+# torch>=1.13.0
+
+# Data Visualization (optional)
+matplotlib>=3.6.0
+seaborn>=0.12.0
+
+# Utilities
+openpyxl>=3.0.0  # For Excel file support
+python-dateutil>=2.8.0
