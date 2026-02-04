@@ -13,7 +13,36 @@ Data is in excel files so needs to be processed before using
 
 ## Newer 2021 Data available in mv-data/
 
-To train, run: (needs you environment to be setup. use conda to create with requirements.txt to include packages)
+Before running any scripts, set up a Python virtual environment to avoid dependency conflicts.
+
+#### Create virtual environment
+
+```
+python3 -m venv venv
+```
+#### Activate virtual environment
+
+
+##### macOS / Linux
+
+```
+source venv/bin/activate
+```
+
+##### Windows (PowerShell)
+
+```
+venv\Scripts\Activate.ps1
+```
+
+### Install Requirements
+```
+pip install -r requirements.txt
+```
+
+## Training
+
+To train, run:
 
 ```
 python Models/resnet_regressor.py
