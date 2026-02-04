@@ -17,8 +17,8 @@ joblib>=1.2.0
 # catboost>=1.1.0
 
 # Optional: Deep Learning (uncomment if needed)
-# tensorflow>=2.11.0
-# torch>=1.13.0
+torch
+torchvision
 
 # Data Visualization (optional)
 matplotlib>=3.6.0
