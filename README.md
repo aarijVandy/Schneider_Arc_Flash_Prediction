@@ -58,8 +58,10 @@ python Models/load_and_predict.py
 
 ## TODOS:
 1. ~~Find more datasets~~
-2. Find what factors are important in this data so we can integrate that into other models
+2. ~~Find what factors are important in this data so we can integrate that into other models~~
 3. ~~Select ML model options~~
-4. Implement load and predict and training using Rasp-Pi
+4. ~~Implement load and predict and training using Rasp-Pi~~
 5. optimize the resnet / other models for better inference and lower mem usage
-6. 
+6. Improve Dashboard Design
+7. Test with the Schneider Hardware
+8. 
