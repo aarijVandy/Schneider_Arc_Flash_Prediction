@@ -1,64 +1,57 @@
 import torch
 import joblib
 import numpy as np
-import pandas as pd
-
-### 
-# 
-# Main script to use to run the tests. this runs it once 
-#
-###
-
 
 print("Loading saved model and scalers...")
 
+feature_cols = ["t", "D_mm", "gap_mm", "Voc", "Ibf"]
+
 # Load scalers
-scaler_X = joblib.load('scaler_X.pkl')
-scaler_y = joblib.load('scaler_y.pkl')
+scaler_X = joblib.load("scaler_X.pkl")
+scaler_y = joblib.load("scaler_y.pkl")
 
-# Load model 
-from resnet_regressor import ResNetRegressor
+from resnet_regressor import LSTMRegressor
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = ResNetRegressor(input_dim=6, hidden_dims=[128, 256, 256, 128], dropout=0.3).to(device)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Load trained weights
-checkpoint = torch.load('resnet_best_model.pth', map_location=device)
-model.load_state_dict(checkpoint['model_state_dict'])
+checkpoint = torch.load("lstm_best_model.pth", map_location=device)
+window_size = checkpoint.get("window_size", 10)
+model = LSTMRegressor(
+    input_dim=len(feature_cols),
+    hidden_dim=128,
+    num_layers=2,
+    dropout=0.3,
+).to(device)
+model.load_state_dict(checkpoint["model_state_dict"])
 
 print("Model loaded successfully!")
-print(f"Best epoch: {checkpoint['epoch']+1}")
-print(f"Validation RMSLE: {checkpoint['val_loss']:.4f}")
+print(f"Best epoch: {checkpoint['epoch'] + 1}")
+print(f"Validation MSE: {checkpoint['val_loss']:.4f}")
+print(f"Window size: {window_size}")
 
+# Example sequence with length = window_size
+example_step = np.array([
+    0.5,    # t (seconds)
+    914.0,  # D_mm (mm)
+    32.0,   # gap_mm (mm)
+    13.8,   # Voc (kV)
+    20.0,   # Ibf (kA)
+])
 
-# Example input: [Iameas, t, D_mm, gap_mm, Voc, Ibf]
-example_input = np.array([[
-    15.0,   # Iameas (arc current in kA)
-    0.5,    # t (time in seconds)
-    914.0,  # D_mm (distance in mm)
-    32.0,   # gap_mm (electrode gap in mm)
-    13.8,   # Voc (open circuit voltage in kV)
-    20.0    # Ibf (bolted fault current in kA)
-]])
+example_sequence = np.tile(example_step, (window_size, 1))
 
-print("\nInput parameters:")
-print(f"  Arc Current (Iameas): {example_input[0][0]} kA")
-print(f"  Time (t): {example_input[0][1]} seconds")
-print(f"  Distance (D_mm): {example_input[0][2]} mm")
-print(f"  Gap (gap_mm): {example_input[0][3]} mm")
-print(f"  Voltage (Voc): {example_input[0][4]} kV")
-print(f"  Fault Current (Ibf): {example_input[0][5]} kA")
+print("\nExample sequence (repeated step):")
+print(example_sequence)
 
-# Scale input
-example_scaled = scaler_X.transform(example_input)
+# Scale and predict
+example_scaled = scaler_X.transform(example_sequence)
+example_scaled = example_scaled[np.newaxis, ...]  # add batch dim
 
-# Make inference
 with torch.no_grad():
     example_tensor = torch.FloatTensor(example_scaled).to(device)
-    prediction_scaled = model(example_tensor).cpu().numpy()
+    pred_scaled = model(example_tensor).cpu().numpy()
 
-# Inverse transform
-prediction = scaler_y.inverse_transform(prediction_scaled)
+pred = scaler_y.inverse_transform(pred_scaled)
 
-print(f"\nPredicted Incident Energy: {prediction[0][0]:.2f} cal/cm²")
-print("="*60)
+print(f"\nPredicted Incident Energy: {pred[0][0]:.2f} cal/cm²")
+print("=" * 60)
